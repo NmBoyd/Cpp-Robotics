@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.1)
+project(FrenetTrajectoryOptimizationScripts)
+message(STATUS "COMPILING FrenetTrajectoryOptimizationScripts")
+
+add_executable(RunFrenetOptimalTrajectory RunFrenetOptimalTrajectory.cpp)
+target_link_libraries(RunFrenetOptimalTrajectory LibFrenetTrajectoryOptimization)
+
+add_executable(TestPolynomial TestPolynomial.cpp)
+target_link_libraries(TestPolynomial LibFrenetTrajectoryOptimization)
+
+# add_executable(TestCubicSpline TestCubicSpline.cpp)
+# target_link_libraries(TestCubicSpline LibFrenetTrajectoryOptimization)
