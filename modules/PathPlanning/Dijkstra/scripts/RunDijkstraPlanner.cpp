@@ -11,7 +11,7 @@
 
 #include "json.hpp"
 #include "matplotlib-cpp/matplotlibcpp.h"
-#include "AStarPlanner.h"
+#include "DijkstraPlanner.h"
 #include <chrono>
  
 using namespace Eigen;
@@ -29,7 +29,7 @@ int main()
     g_y = 50.0;
     
     double grid_size = 1.0; // [m]
-    double robot_radius = 1.0; // [m]
+    double robot_radius = 2.0; // [m]
 
     // Occupied spaces
     std::vector<double> ob_x, ob_y;
@@ -59,17 +59,16 @@ int main()
     }
 
     std::cout << "Creating planner" << std::endl;
-    AStarPlanner a_star(ob_x, ob_y, grid_size, robot_radius);
+    DijkstraPlanner dijkstra(ob_x, ob_y, grid_size, robot_radius);
 
     std::cout << "Trying to find path" << std::endl;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-    std::shared_ptr<Path> path = a_star.Plan(s_x, s_y, g_x, g_y);
+    std::shared_ptr<Path> path = dijkstra.Plan(s_x, s_y, g_x, g_y);
 
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
     std::cout << "Calculated path in: " << time_span.count() << " seconds" << std::endl;
-    std::cout << "Calculated path" << std::endl;
     plt::clf();
     plt::scatter(ob_x, ob_y,200.0);
     plt::plot(path->x, path->y);
