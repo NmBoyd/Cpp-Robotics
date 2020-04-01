@@ -22,9 +22,9 @@ public:
 
     RRTStarPlanner(Node* start_node, Node* goal_node, 
                    std::vector<Obstacle> obstacle_list, 
-                   std::vector<double> rand_area, double expand_dist=1.0, 
-                   double path_resolution=0.5, int goal_sample_rate=5, 
-                   int max_iterations=500, double connect_circle_dist=50)
+                   std::vector<double> rand_area, double expand_dist=5.0, 
+                   double path_resolution=0.5, int goal_sample_rate=20, 
+                   int max_iterations=300, double connect_circle_dist=50)
         : RRTPlanner(start_node, goal_node,
                     obstacle_list,
                     rand_area, expand_dist,

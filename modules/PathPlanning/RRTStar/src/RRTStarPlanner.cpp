@@ -4,11 +4,12 @@ Node* RRTStarPlanner::ChooseParent(Node* new_node, std::vector<Node*> neighbors)
 {
     Node* output;
     if (neighbors.size()==0) {
+        std::cout << "No neighbors found to determine parent" << std::endl;
         return output;
     }
     std::vector<double> costs;
     for (Node* near_node: neighbors) {
-        Node* t_node = Steer(near_node, new_node, expand_dist_);
+        Node* t_node = Steer(near_node, new_node);
         if (t_node != NULL && CollisionCheck(t_node)) {
             costs.push_back(CalcNewCost(near_node, new_node));
         }
@@ -19,22 +20,27 @@ Node* RRTStarPlanner::ChooseParent(Node* new_node, std::vector<Node*> neighbors)
     }
     double min_cost = std::numeric_limits<double>::max();
     Node* min_cost_node;
-    for (int i=0;i<costs.size();i++) {
-        if (costs[i] < min_cost) {
+    std::cout << "Costs: ";
+    for (int i=0; i<costs.size(); i++) {
+        std::cout << costs[i] << ", ";  
+        if (costs[i] < min_cost && costs[i] != 1) {
             min_cost = costs[i];
             min_cost_node = node_list_[i];
         }
     }
+    std::cout <<""<< std::endl;
+
+    std::cout <<"Min Cost Parent Node: <" << min_cost_node->x_ <<","<<min_cost_node->y_<<"> Cost: " << min_cost << std::endl;  
     if (min_cost == std::numeric_limits<double>::max()) {
         std::cout << "There is no valid path. Min cost = inf" << std::endl;
         return output;
     }
 
-    new_node = Steer(min_cost_node, new_node, expand_dist_);
-    new_node->parent_ = min_cost_node;
-    new_node->cost_ = min_cost;
+    output = Steer(min_cost_node, new_node);
+    output->parent_ = min_cost_node;
+    output->cost_ = min_cost;
 
-    return new_node;
+    return output;
 }
 
 double RRTStarPlanner::CalcNewCost(Node* from_node, Node* target_node)
@@ -56,7 +62,7 @@ std::vector<Node*> RRTStarPlanner::FindNearNodes(Node* new_node)
     {
         if (hypot((n->x_-new_node->x_), (n->y_-new_node->y_)) <= r) {
             output.push_back(n);
-            std::cout << "Nearby node: " << n->x_<<","<<n->y_<<std::endl;
+            // std::cout << "Nearby node: " << n->x_<<","<<n->y_<<std::endl;
         }
     }
     return output;
@@ -77,7 +83,7 @@ void RRTStarPlanner::Rewire(Node* new_node, std::vector<Node*> neighbor_nodes)
 {
     for (int i=0; i < neighbor_nodes.size(); i++) 
     {
-        Node* edge_node = Steer(new_node, neighbor_nodes[i], expand_dist_);
+        Node* edge_node = Steer(new_node, neighbor_nodes[i]);
         if (neighbor_nodes[i] == NULL) continue;
 
         edge_node->cost_ = CalcNewCost(new_node, neighbor_nodes[i]);
@@ -110,6 +116,7 @@ std::shared_ptr<Path> RRTStarPlanner::Plan()
     node_list_.push_back(start_);
     for (int i=0;i<max_iter_;i++)
     {
+        std::cout << "Iter:"<< i<< ", number of nodes:"<< node_list_.size()<<std::endl;
         std::pair<double,double> rand_pt;
         // std::cout << "Generating random point" << std::endl;
         if (goal_dis_(goal_gen_)>goal_sample_rate_)
@@ -134,11 +141,11 @@ std::shared_ptr<Path> RRTStarPlanner::Plan()
 
         std::cout << "Determining nearest node and parent" << std::endl;
         std::vector<Node*> neighbor_nodes = FindNearNodes(new_node);
-        // new_node = ChooseParent(new_node, neighbor_nodes);
+        new_node = ChooseParent(new_node, neighbor_nodes);
         node_list_.push_back(new_node);
 
         std::cout << "Rewiring" << std::endl;
-        // Rewire(new_node, neighbor_nodes);
+        Rewire(new_node, neighbor_nodes);
         
         #ifdef ANIMATE
             cv::line(
@@ -156,14 +163,14 @@ std::shared_ptr<Path> RRTStarPlanner::Plan()
 
         if (hypot(new_node->x_-end_->x_, new_node->y_-end_->y_) <= expand_dist_) {
             std::cout << "Path found" << std::endl;
-            break;
+            // break;
         }
     }
 
     #ifdef ANIMATE
         std::shared_ptr<Path> path = GenerateFinalPath(bg, img_reso);
         cv::imshow("rrt_star", bg);
-        cv::waitKey(2000);
+        cv::waitKey(4000);
     #else
         std::shared_ptr<Path> path = GenerateFinalPath();
     #endif 

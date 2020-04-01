@@ -38,7 +38,7 @@ int main(){
 
     std::cout << "Creating planner" << std::endl;
 	// RRTStarPlanner rrt_star(start, goal, obstacle_list, rand_area, 0.5, 1.0, 5, 500, 50.0);
-    RRTStarPlanner rrt_star(start, goal, obstacle_list, rand_area, 0.5);
+    RRTStarPlanner rrt_star(start, goal, obstacle_list, rand_area, 1);
 
 
     std::cout << "Trying to find path" << std::endl;
