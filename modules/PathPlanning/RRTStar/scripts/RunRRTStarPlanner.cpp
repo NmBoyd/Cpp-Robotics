@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <chrono>
 
 #include <Eigen/Core>
 #include <Eigen/QR>
@@ -11,8 +12,7 @@
 
 #include "json.hpp"
 #include "matplotlib-cpp/matplotlibcpp.h"
-#include "RRTPlanner.h"
-#include <chrono>
+#include "RRTStarPlanner.h"
  
 using namespace Eigen;
 using namespace std::chrono;
@@ -37,17 +37,22 @@ int main(){
     end_pts_x.push_back(goal->x_); end_pts_y.push_back(goal->y_);
 
     std::cout << "Creating planner" << std::endl;
-	RRTPlanner rrt(start, goal, obstacle_list, rand_area, 0.5);
+	// RRTStarPlanner rrt_star(start, goal, obstacle_list, rand_area, 0.5, 1.0, 5, 500, 50.0);
+    RRTStarPlanner rrt_star(start, goal, obstacle_list, rand_area, 0.5);
 
 
     std::cout << "Trying to find path" << std::endl;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-	std::shared_ptr<Path> path = rrt.Plan();
+	std::shared_ptr<Path> path = rrt_star.Plan();
 
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
     std::cout << "Calculated path in: " << time_span.count() << " seconds" << std::endl;
     std::cout << "Calculated path" << std::endl;
+
+    for (int i=0;i<path->x_.size();i++) {
+        std::cout << "Point: " << i << " at <"<<path->x_[i]<<","<<path->y_[i]<<">"<<std::endl;
+    }
 
 }

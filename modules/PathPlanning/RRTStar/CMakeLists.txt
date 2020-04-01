@@ -1,4 +1,4 @@
-project(RRTPlanner)
+project(RRTStarPlanner)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "COMPILING AStar")
 
@@ -18,7 +18,8 @@ add_library(Lib${PROJECT_NAME} STATIC
 set(${PROJECT_NAME}_REQUIRED_LIBRARIES
     Eigen3::Eigen
     ${PYTHON_LIBRARIES}
-    ${OpenCV_LIBS})    
+    ${OpenCV_LIBS}
+    LibRRTPlanner)    
 
 
 target_link_libraries(Lib${PROJECT_NAME} ${${PROJECT_NAME}_REQUIRED_LIBRARIES})
